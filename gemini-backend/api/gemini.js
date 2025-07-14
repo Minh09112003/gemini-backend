@@ -8,13 +8,13 @@ module.exports = async (req, res) => {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { contents } = req.body;
+  const { messages } = req.body;
 
   try {
     const response = await fetch(API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ contents }),
+      body: JSON.stringify({ contents: messages }),
     });
 
     const data = await response.json();
