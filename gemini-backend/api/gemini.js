@@ -1,13 +1,13 @@
-// /api/gemini.js
-const express = require("express");
-const { default: fetch } = require("node-fetch"); // hoặc dùng axios
-const app = express();
-app.use(express.json());
+import fetch from "node-fetch";
 
-const API_KEY = "YOUR_SECRET_KEY";
-const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-pro:generateContent?key=${API_KEY}`;
+export default async function handler(req, res) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Phương thức không được hỗ trợ" });
+  }
 
-app.post("/api/gemini", async (req, res) => {
+  const API_KEY = process.env.GEMINI_API_KEY;
+  const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-pro:generateContent?key=${API_KEY}`;
+
   const { messages } = req.body;
 
   try {
@@ -18,6 +18,7 @@ app.post("/api/gemini", async (req, res) => {
     });
 
     const data = await geminiRes.json();
+
     if (!geminiRes.ok) {
       return res.status(500).json({ error: data.error.message });
     }
@@ -26,7 +27,4 @@ app.post("/api/gemini", async (req, res) => {
   } catch (err) {
     return res.status(500).json({ error: err.message || "Unknown error" });
   }
-});
-
-// Export như Vercel yêu cầu
-module.exports = app;
+}
