@@ -1,18 +1,24 @@
 const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 
 const API_KEY = process.env.GEMINI_API_KEY;
-
-// 🔁 Sửa model tại đây nếu muốn (gợi ý: dùng gemini-2.0-flash hoặc gemini-2.5-pro-latest)
 const API_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
 
 module.exports = async (req, res) => {
+  // ✅ FIX CORS
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  if (req.method === "OPTIONS") {
+    return res.status(200).end(); // Preflight check
+  }
+
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
   const { messages } = req.body;
 
-  // ✅ Chuyển messages (giống ChatGPT style) → contents (đúng format Gemini)
   const contents = messages.map(msg => ({
     role: msg.role,
     parts: [{ text: msg.content }]
